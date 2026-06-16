@@ -1,0 +1,1145 @@
+{
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/Zakariya-24/Python-Projects/blob/main/Zakariya%20Notebook%20Part%203\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "id": "ae0a5ad5",
+      "metadata": {
+        "id": "ae0a5ad5"
+      },
+      "source": [
+        "# Intro to Pandas\n",
+        "by Ryan Orsinger"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "id": "efbbdb31",
+      "metadata": {
+        "id": "efbbdb31"
+      },
+      "source": [
+        "## Module 3: DataFrames Continued\n",
+        "\n",
+        "### Pandas DataFrames Continued - Identifying Missing Values\n",
+        "- Identifying and counting missing values\n",
+        "- Removing rows with missing information\n",
+        "- Dropping columns from a DataFrame"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "id": "fda235a9",
+      "metadata": {
+        "id": "fda235a9"
+      },
+      "outputs": [],
+      "source": [
+        "import pandas as pd"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "id": "cd800ff1",
+      "metadata": {
+        "id": "cd800ff1"
+      },
+      "outputs": [],
+      "source": [
+        "# Let's generate some data with missing values.\n",
+        "# Real world data often has missing values\n",
+        "df = pd.DataFrame([\n",
+        "    {\n",
+        "        \"item\": \"crackers\",\n",
+        "        \"serving_size\": \"4 crackers\",\n",
+        "        \"calories\": 10,\n",
+        "        \"fat\": \"1.1g\",\n",
+        "        \"sodium\": \"125mg\",\n",
+        "        \"price\": 2.99,\n",
+        "        \"discount\": None\n",
+        "    },\n",
+        "    {\n",
+        "        \"item\": \"club soda\",\n",
+        "        \"serving_size\": \"8 oz\",\n",
+        "        \"calories\": None,\n",
+        "        \"fat\": None,\n",
+        "        \"sodium\": \"75mg\",\n",
+        "        \"price\": 2.25,\n",
+        "        \"discount\": None\n",
+        "\n",
+        "    },\n",
+        "    {\n",
+        "        \"item\": \"apple\",\n",
+        "        \"serving_size\": 2,\n",
+        "        \"calories\": 95,\n",
+        "        \"fat\": None,\n",
+        "        \"sodium\": None,\n",
+        "        \"price\": 1.99,\n",
+        "        \"discount\": None\n",
+        "    },\n",
+        "    {\n",
+        "        \"item\": \"banana\",\n",
+        "        \"serving_size\": 3,\n",
+        "        \"calories\": 105,\n",
+        "        \"fat\": \"0.4g\",\n",
+        "        \"sodium\": \"1mg\",\n",
+        "        \"price\": None,\n",
+        "        \"discount\": None\n",
+        "    },\n",
+        "    {\n",
+        "        \"item\": \"spam\",\n",
+        "        \"serving_size\": \"1 tin\",\n",
+        "        \"calories\": None,\n",
+        "        \"fat\": None,\n",
+        "        \"sodium\": None,\n",
+        "        \"price\": None,\n",
+        "        \"discount\": None\n",
+        "    }\n",
+        "])\n",
+        "\n",
+        "# Set the index to be the item name\n",
+        "df.set_index(\"item\", inplace=True)\n",
+        "df"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "id": "1e32b1c6",
+      "metadata": {
+        "id": "1e32b1c6"
+      },
+      "outputs": [],
+      "source": [
+        "# The .info method outputs data types and non-null value count\n",
+        "df.info()"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "id": "a87461c1",
+      "metadata": {
+        "id": "a87461c1"
+      },
+      "outputs": [],
+      "source": [
+        "# Notice that missing values in a numeric column show as NaN, which means \"not a number\"\n",
+        "# For more on NaN, see https://en.wikipedia.org/wiki/NaN\n",
+        "df.calories"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "id": "3ff30bf8",
+      "metadata": {
+        "id": "3ff30bf8"
+      },
+      "outputs": [],
+      "source": [
+        "# NaN exists to allow us to do math without getting execution errors\n",
+        "# Many math functions ignore NaNs\n",
+        "df.calories.mean()"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "id": "ef7484b6",
+      "metadata": {
+        "id": "ef7484b6"
+      },
+      "outputs": [],
+      "source": [
+        "# By default, .value_counts ignores NaNs, too\n",
+        "df.sodium.value_counts()"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "id": "5b08a6a3",
+      "metadata": {
+        "id": "5b08a6a3"
+      },
+      "outputs": [],
+      "source": [
+        "# Use dropna=False to count missing values\n",
+        "df.sodium.value_counts(dropna=False)"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "id": "7067d296",
+      "metadata": {
+        "id": "7067d296"
+      },
+      "outputs": [],
+      "source": [
+        "# Notice that missing values in a string/object column show as None\n",
+        "df.fat"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "id": "6287b882",
+      "metadata": {
+        "id": "6287b882"
+      },
+      "outputs": [],
+      "source": [
+        "# .isna() can operate on a column, returning a boolean series\n",
+        "df.sodium.isna()"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "id": "aa29eb00",
+      "metadata": {
+        "id": "aa29eb00"
+      },
+      "outputs": [],
+      "source": [
+        "# .isna() can also operate on the entire dataframe\n",
+        "df.isna()"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "id": "32feee21",
+      "metadata": {
+        "id": "32feee21"
+      },
+      "outputs": [],
+      "source": [
+        "# Counting the number of nulls by column\n",
+        "print(\"Number of nulls by column\")\n",
+        "df.isna().sum()"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "id": "bf9eee13",
+      "metadata": {
+        "id": "bf9eee13"
+      },
+      "outputs": [],
+      "source": [
+        "print(\"Proportion of nulls by column\")\n",
+        "df.isna().mean()"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "id": "1e9fb285",
+      "metadata": {
+        "id": "1e9fb285"
+      },
+      "outputs": [],
+      "source": [
+        "# Counting the number of nulls by row\n",
+        "# Recall that .sum can run on columns or by row, by row with axis=1\n",
+        "print(\"Number of nulls by row\")\n",
+        "df.isna().sum(axis=1)"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "id": "96a32b29",
+      "metadata": {
+        "id": "96a32b29"
+      },
+      "outputs": [],
+      "source": [
+        "# Proportion of the number of nulls by row\n",
+        "# Recall that .sum can run on columns or by row, by row with axis=1\n",
+        "print(\"Proportion of nulls by row\")\n",
+        "df.isna().mean(axis=1)"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "id": "ccad9754",
+      "metadata": {
+        "id": "ccad9754"
+      },
+      "source": [
+        "### Handling Missing Values\n",
+        "- There's no one right answer for all cases.\n",
+        "- \"It depends\" is a common answer in data science. Context matters.\n",
+        "- Sometimes missing values might mean zero, depending on the context, so we can fill in zero.\n",
+        "- Sometimes, dropping entire rows or columns is appropriate\n",
+        "- Sometimes, filling missing values makes sense to keep the rest of the row or column's data"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "id": "950304d1",
+      "metadata": {
+        "id": "950304d1"
+      },
+      "outputs": [],
+      "source": [
+        "# Example of removing null values\n",
+        "# dropna drops every row with a null value\n",
+        "# Since there is missing data in every row, this is quite destructive...\n",
+        "# the default axis argument is axis=0, which means row-wise\n",
+        "df.dropna()"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "id": "24bb2a02",
+      "metadata": {
+        "id": "24bb2a02"
+      },
+      "outputs": [],
+      "source": [
+        "# dropna(axis=1) drops all columns with any missing values\n",
+        "# This is also too destructive to be helpful\n",
+        "df.dropna(axis=1)"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "id": "32693b55",
+      "metadata": {
+        "id": "32693b55"
+      },
+      "outputs": [],
+      "source": [
+        "# Let's review the dataframe\n",
+        "df"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "id": "c113d076",
+      "metadata": {
+        "id": "c113d076"
+      },
+      "outputs": [],
+      "source": [
+        "# The discount column is adding no information here, so we can drop it\n",
+        "df.drop(columns=\"discount\", inplace=True)\n",
+        "df"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "id": "f9fa74c4",
+      "metadata": {
+        "id": "f9fa74c4"
+      },
+      "outputs": [],
+      "source": [
+        "# Reassign the df\n",
+        "# df.drop(index=[\"spam\"], inplace=True) would produce the same result\n",
+        "df = df[df.index != \"spam\"]\n",
+        "df"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "id": "f183259a",
+      "metadata": {
+        "id": "f183259a"
+      },
+      "source": [
+        "## Additional Resources\n",
+        "- [.isnull](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.isnull.html) is an alias for `isna`.\n",
+        "- The [.value_counts](https://pandas.pydata.org/docs/reference/api/pandas.Series.value_counts.html) documentation\n",
+        "- [Pandas .isna documentation](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.isna.html)"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "id": "40cc58ae",
+      "metadata": {
+        "id": "40cc58ae"
+      },
+      "source": [
+        "## Exercises\n",
+        "- Use `pd.read_csv` to read `\"penguins.csv\"` into a dataframe variable named `penguins`\n",
+        "- Write the pandas code to count the number of missing values by column\n",
+        "- Write the pandas necessary to get the proportion of missing values by row. Store this to a variable named `percent_missing_by_row`\n",
+        "- Sort the `percent_missing_by_row` series in descending order. How many of the rows are mostly empty?"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "import pandas as pd"
+      ],
+      "metadata": {
+        "id": "Ila-C2QRGx4h"
+      },
+      "id": "Ila-C2QRGx4h",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "id": "611b3d8a",
+      "metadata": {
+        "id": "611b3d8a",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 69
+        },
+        "outputId": "a8c793fe-06a4-4b7f-816b-38023e0e6fdb"
+      },
+      "outputs": [
+        {
+          "output_type": "display_data",
+          "data": {
+            "text/plain": [
+              "<IPython.core.display.HTML object>"
+            ],
+            "text/html": [
+              "\n",
+              "     <input type=\"file\" id=\"files-5c2e31a7-4b77-4745-8818-225f29ceb5bb\" name=\"files[]\" multiple disabled\n",
+              "        style=\"border:none\" />\n",
+              "     <output id=\"result-5c2e31a7-4b77-4745-8818-225f29ceb5bb\">\n",
+              "      Upload widget is only available when the cell has been executed in the\n",
+              "      current browser session. Please rerun this cell to enable.\n",
+              "      </output>\n",
+              "      <script>// Copyright 2017 Google LLC\n",
+              "//\n",
+              "// Licensed under the Apache License, Version 2.0 (the \"License\");\n",
+              "// you may not use this file except in compliance with the License.\n",
+              "// You may obtain a copy of the License at\n",
+              "//\n",
+              "//      http://www.apache.org/licenses/LICENSE-2.0\n",
+              "//\n",
+              "// Unless required by applicable law or agreed to in writing, software\n",
+              "// distributed under the License is distributed on an \"AS IS\" BASIS,\n",
+              "// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n",
+              "// See the License for the specific language governing permissions and\n",
+              "// limitations under the License.\n",
+              "\n",
+              "/**\n",
+              " * @fileoverview Helpers for google.colab Python module.\n",
+              " */\n",
+              "(function(scope) {\n",
+              "function span(text, styleAttributes = {}) {\n",
+              "  const element = document.createElement('span');\n",
+              "  element.textContent = text;\n",
+              "  for (const key of Object.keys(styleAttributes)) {\n",
+              "    element.style[key] = styleAttributes[key];\n",
+              "  }\n",
+              "  return element;\n",
+              "}\n",
+              "\n",
+              "// Max number of bytes which will be uploaded at a time.\n",
+              "const MAX_PAYLOAD_SIZE = 100 * 1024;\n",
+              "\n",
+              "function _uploadFiles(inputId, outputId) {\n",
+              "  const steps = uploadFilesStep(inputId, outputId);\n",
+              "  const outputElement = document.getElementById(outputId);\n",
+              "  // Cache steps on the outputElement to make it available for the next call\n",
+              "  // to uploadFilesContinue from Python.\n",
+              "  outputElement.steps = steps;\n",
+              "\n",
+              "  return _uploadFilesContinue(outputId);\n",
+              "}\n",
+              "\n",
+              "// This is roughly an async generator (not supported in the browser yet),\n",
+              "// where there are multiple asynchronous steps and the Python side is going\n",
+              "// to poll for completion of each step.\n",
+              "// This uses a Promise to block the python side on completion of each step,\n",
+              "// then passes the result of the previous step as the input to the next step.\n",
+              "function _uploadFilesContinue(outputId) {\n",
+              "  const outputElement = document.getElementById(outputId);\n",
+              "  const steps = outputElement.steps;\n",
+              "\n",
+              "  const next = steps.next(outputElement.lastPromiseValue);\n",
+              "  return Promise.resolve(next.value.promise).then((value) => {\n",
+              "    // Cache the last promise value to make it available to the next\n",
+              "    // step of the generator.\n",
+              "    outputElement.lastPromiseValue = value;\n",
+              "    return next.value.response;\n",
+              "  });\n",
+              "}\n",
+              "\n",
+              "/**\n",
+              " * Generator function which is called between each async step of the upload\n",
+              " * process.\n",
+              " * @param {string} inputId Element ID of the input file picker element.\n",
+              " * @param {string} outputId Element ID of the output display.\n",
+              " * @return {!Iterable<!Object>} Iterable of next steps.\n",
+              " */\n",
+              "function* uploadFilesStep(inputId, outputId) {\n",
+              "  const inputElement = document.getElementById(inputId);\n",
+              "  inputElement.disabled = false;\n",
+              "\n",
+              "  const outputElement = document.getElementById(outputId);\n",
+              "  outputElement.innerHTML = '';\n",
+              "\n",
+              "  const pickedPromise = new Promise((resolve) => {\n",
+              "    inputElement.addEventListener('change', (e) => {\n",
+              "      resolve(e.target.files);\n",
+              "    });\n",
+              "  });\n",
+              "\n",
+              "  const cancel = document.createElement('button');\n",
+              "  inputElement.parentElement.appendChild(cancel);\n",
+              "  cancel.textContent = 'Cancel upload';\n",
+              "  const cancelPromise = new Promise((resolve) => {\n",
+              "    cancel.onclick = () => {\n",
+              "      resolve(null);\n",
+              "    };\n",
+              "  });\n",
+              "\n",
+              "  // Wait for the user to pick the files.\n",
+              "  const files = yield {\n",
+              "    promise: Promise.race([pickedPromise, cancelPromise]),\n",
+              "    response: {\n",
+              "      action: 'starting',\n",
+              "    }\n",
+              "  };\n",
+              "\n",
+              "  cancel.remove();\n",
+              "\n",
+              "  // Disable the input element since further picks are not allowed.\n",
+              "  inputElement.disabled = true;\n",
+              "\n",
+              "  if (!files) {\n",
+              "    return {\n",
+              "      response: {\n",
+              "        action: 'complete',\n",
+              "      }\n",
+              "    };\n",
+              "  }\n",
+              "\n",
+              "  for (const file of files) {\n",
+              "    const li = document.createElement('li');\n",
+              "    li.append(span(file.name, {fontWeight: 'bold'}));\n",
+              "    li.append(span(\n",
+              "        `(${file.type || 'n/a'}) - ${file.size} bytes, ` +\n",
+              "        `last modified: ${\n",
+              "            file.lastModifiedDate ? file.lastModifiedDate.toLocaleDateString() :\n",
+              "                                    'n/a'} - `));\n",
+              "    const percent = span('0% done');\n",
+              "    li.appendChild(percent);\n",
+              "\n",
+              "    outputElement.appendChild(li);\n",
+              "\n",
+              "    const fileDataPromise = new Promise((resolve) => {\n",
+              "      const reader = new FileReader();\n",
+              "      reader.onload = (e) => {\n",
+              "        resolve(e.target.result);\n",
+              "      };\n",
+              "      reader.readAsArrayBuffer(file);\n",
+              "    });\n",
+              "    // Wait for the data to be ready.\n",
+              "    let fileData = yield {\n",
+              "      promise: fileDataPromise,\n",
+              "      response: {\n",
+              "        action: 'continue',\n",
+              "      }\n",
+              "    };\n",
+              "\n",
+              "    // Use a chunked sending to avoid message size limits. See b/62115660.\n",
+              "    let position = 0;\n",
+              "    do {\n",
+              "      const length = Math.min(fileData.byteLength - position, MAX_PAYLOAD_SIZE);\n",
+              "      const chunk = new Uint8Array(fileData, position, length);\n",
+              "      position += length;\n",
+              "\n",
+              "      const base64 = btoa(String.fromCharCode.apply(null, chunk));\n",
+              "      yield {\n",
+              "        response: {\n",
+              "          action: 'append',\n",
+              "          file: file.name,\n",
+              "          data: base64,\n",
+              "        },\n",
+              "      };\n",
+              "\n",
+              "      let percentDone = fileData.byteLength === 0 ?\n",
+              "          100 :\n",
+              "          Math.round((position / fileData.byteLength) * 100);\n",
+              "      percent.textContent = `${percentDone}% done`;\n",
+              "\n",
+              "    } while (position < fileData.byteLength);\n",
+              "  }\n",
+              "\n",
+              "  // All done.\n",
+              "  yield {\n",
+              "    response: {\n",
+              "      action: 'complete',\n",
+              "    }\n",
+              "  };\n",
+              "}\n",
+              "\n",
+              "scope.google = scope.google || {};\n",
+              "scope.google.colab = scope.google.colab || {};\n",
+              "scope.google.colab._files = {\n",
+              "  _uploadFiles,\n",
+              "  _uploadFilesContinue,\n",
+              "};\n",
+              "})(self);\n",
+              "</script> "
+            ]
+          },
+          "metadata": {}
+        },
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Saving penguins.csv to penguins.csv\n"
+          ]
+        }
+      ],
+      "source": [
+        "from google.colab import files\n",
+        "uploaded = files.upload()"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "id": "b851cc92",
+      "metadata": {
+        "id": "b851cc92"
+      },
+      "outputs": [],
+      "source": [
+        "# Use `pd.read_csv` to read `\"penguins.csv\"` into a dataframe variable named `penguins`\n",
+        "df= pd.read_csv(\"penguins.csv\")"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "id": "1deb7fe4",
+      "metadata": {
+        "id": "1deb7fe4",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 331
+        },
+        "outputId": "220547b3-6df0-4f84-afef-3d67f45d478d"
+      },
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "species               0\n",
+              "island                0\n",
+              "bill_length_mm        2\n",
+              "bill_depth_mm         2\n",
+              "flipper_length_mm     2\n",
+              "body_mass_g           2\n",
+              "sex                  11\n",
+              "year                  0\n",
+              "dtype: int64"
+            ],
+            "text/html": [
+              "<div>\n",
+              "<style scoped>\n",
+              "    .dataframe tbody tr th:only-of-type {\n",
+              "        vertical-align: middle;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe tbody tr th {\n",
+              "        vertical-align: top;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe thead th {\n",
+              "        text-align: right;\n",
+              "    }\n",
+              "</style>\n",
+              "<table border=\"1\" class=\"dataframe\">\n",
+              "  <thead>\n",
+              "    <tr style=\"text-align: right;\">\n",
+              "      <th></th>\n",
+              "      <th>0</th>\n",
+              "    </tr>\n",
+              "  </thead>\n",
+              "  <tbody>\n",
+              "    <tr>\n",
+              "      <th>species</th>\n",
+              "      <td>0</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>island</th>\n",
+              "      <td>0</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>bill_length_mm</th>\n",
+              "      <td>2</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>bill_depth_mm</th>\n",
+              "      <td>2</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>flipper_length_mm</th>\n",
+              "      <td>2</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>body_mass_g</th>\n",
+              "      <td>2</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>sex</th>\n",
+              "      <td>11</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>year</th>\n",
+              "      <td>0</td>\n",
+              "    </tr>\n",
+              "  </tbody>\n",
+              "</table>\n",
+              "</div><br><label><b>dtype:</b> int64</label>"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 17
+        }
+      ],
+      "source": [
+        "# Use .isna to count the number of missing values by column\n",
+        "df.isnull().sum()\n",
+        "\n"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "id": "dd3514aa",
+      "metadata": {
+        "id": "dd3514aa"
+      },
+      "outputs": [],
+      "source": [
+        "# Write the pandas necessary to get the proportion of missing values by row.\n",
+        "# Store this to a variable named `percent_missing_by_row`\n",
+        "\n",
+        "percent_missing_by_row=df.dropna()"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "id": "c7cae724",
+      "metadata": {
+        "id": "c7cae724",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 419
+        },
+        "outputId": "6f1a16e3-43de-447d-8eb0-cf7a16673dd9"
+      },
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "       species     island  bill_length_mm  bill_depth_mm  flipper_length_mm  \\\n",
+              "343  Chinstrap      Dream            50.2           18.7              198.0   \n",
+              "342  Chinstrap      Dream            50.8           19.0              210.0   \n",
+              "341  Chinstrap      Dream            49.6           18.2              193.0   \n",
+              "340  Chinstrap      Dream            43.5           18.1              202.0   \n",
+              "339  Chinstrap      Dream            55.8           19.8              207.0   \n",
+              "..         ...        ...             ...            ...                ...   \n",
+              "5       Adelie  Torgersen            39.3           20.6              190.0   \n",
+              "4       Adelie  Torgersen            36.7           19.3              193.0   \n",
+              "2       Adelie  Torgersen            40.3           18.0              195.0   \n",
+              "1       Adelie  Torgersen            39.5           17.4              186.0   \n",
+              "0       Adelie  Torgersen            39.1           18.7              181.0   \n",
+              "\n",
+              "     body_mass_g     sex  year  \n",
+              "343       3775.0  female  2009  \n",
+              "342       4100.0    male  2009  \n",
+              "341       3775.0    male  2009  \n",
+              "340       3400.0  female  2009  \n",
+              "339       4000.0    male  2009  \n",
+              "..           ...     ...   ...  \n",
+              "5         3650.0    male  2007  \n",
+              "4         3450.0  female  2007  \n",
+              "2         3250.0  female  2007  \n",
+              "1         3800.0  female  2007  \n",
+              "0         3750.0    male  2007  \n",
+              "\n",
+              "[333 rows x 8 columns]"
+            ],
+            "text/html": [
+              "\n",
+              "  <div id=\"df-0f3e9059-10a1-4ae0-9f5c-041b7bce5ed1\" class=\"colab-df-container\">\n",
+              "    <div>\n",
+              "<style scoped>\n",
+              "    .dataframe tbody tr th:only-of-type {\n",
+              "        vertical-align: middle;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe tbody tr th {\n",
+              "        vertical-align: top;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe thead th {\n",
+              "        text-align: right;\n",
+              "    }\n",
+              "</style>\n",
+              "<table border=\"1\" class=\"dataframe\">\n",
+              "  <thead>\n",
+              "    <tr style=\"text-align: right;\">\n",
+              "      <th></th>\n",
+              "      <th>species</th>\n",
+              "      <th>island</th>\n",
+              "      <th>bill_length_mm</th>\n",
+              "      <th>bill_depth_mm</th>\n",
+              "      <th>flipper_length_mm</th>\n",
+              "      <th>body_mass_g</th>\n",
+              "      <th>sex</th>\n",
+              "      <th>year</th>\n",
+              "    </tr>\n",
+              "  </thead>\n",
+              "  <tbody>\n",
+              "    <tr>\n",
+              "      <th>343</th>\n",
+              "      <td>Chinstrap</td>\n",
+              "      <td>Dream</td>\n",
+              "      <td>50.2</td>\n",
+              "      <td>18.7</td>\n",
+              "      <td>198.0</td>\n",
+              "      <td>3775.0</td>\n",
+              "      <td>female</td>\n",
+              "      <td>2009</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>342</th>\n",
+              "      <td>Chinstrap</td>\n",
+              "      <td>Dream</td>\n",
+              "      <td>50.8</td>\n",
+              "      <td>19.0</td>\n",
+              "      <td>210.0</td>\n",
+              "      <td>4100.0</td>\n",
+              "      <td>male</td>\n",
+              "      <td>2009</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>341</th>\n",
+              "      <td>Chinstrap</td>\n",
+              "      <td>Dream</td>\n",
+              "      <td>49.6</td>\n",
+              "      <td>18.2</td>\n",
+              "      <td>193.0</td>\n",
+              "      <td>3775.0</td>\n",
+              "      <td>male</td>\n",
+              "      <td>2009</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>340</th>\n",
+              "      <td>Chinstrap</td>\n",
+              "      <td>Dream</td>\n",
+              "      <td>43.5</td>\n",
+              "      <td>18.1</td>\n",
+              "      <td>202.0</td>\n",
+              "      <td>3400.0</td>\n",
+              "      <td>female</td>\n",
+              "      <td>2009</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>339</th>\n",
+              "      <td>Chinstrap</td>\n",
+              "      <td>Dream</td>\n",
+              "      <td>55.8</td>\n",
+              "      <td>19.8</td>\n",
+              "      <td>207.0</td>\n",
+              "      <td>4000.0</td>\n",
+              "      <td>male</td>\n",
+              "      <td>2009</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>...</th>\n",
+              "      <td>...</td>\n",
+              "      <td>...</td>\n",
+              "      <td>...</td>\n",
+              "      <td>...</td>\n",
+              "      <td>...</td>\n",
+              "      <td>...</td>\n",
+              "      <td>...</td>\n",
+              "      <td>...</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>5</th>\n",
+              "      <td>Adelie</td>\n",
+              "      <td>Torgersen</td>\n",
+              "      <td>39.3</td>\n",
+              "      <td>20.6</td>\n",
+              "      <td>190.0</td>\n",
+              "      <td>3650.0</td>\n",
+              "      <td>male</td>\n",
+              "      <td>2007</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>4</th>\n",
+              "      <td>Adelie</td>\n",
+              "      <td>Torgersen</td>\n",
+              "      <td>36.7</td>\n",
+              "      <td>19.3</td>\n",
+              "      <td>193.0</td>\n",
+              "      <td>3450.0</td>\n",
+              "      <td>female</td>\n",
+              "      <td>2007</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>2</th>\n",
+              "      <td>Adelie</td>\n",
+              "      <td>Torgersen</td>\n",
+              "      <td>40.3</td>\n",
+              "      <td>18.0</td>\n",
+              "      <td>195.0</td>\n",
+              "      <td>3250.0</td>\n",
+              "      <td>female</td>\n",
+              "      <td>2007</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>1</th>\n",
+              "      <td>Adelie</td>\n",
+              "      <td>Torgersen</td>\n",
+              "      <td>39.5</td>\n",
+              "      <td>17.4</td>\n",
+              "      <td>186.0</td>\n",
+              "      <td>3800.0</td>\n",
+              "      <td>female</td>\n",
+              "      <td>2007</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>0</th>\n",
+              "      <td>Adelie</td>\n",
+              "      <td>Torgersen</td>\n",
+              "      <td>39.1</td>\n",
+              "      <td>18.7</td>\n",
+              "      <td>181.0</td>\n",
+              "      <td>3750.0</td>\n",
+              "      <td>male</td>\n",
+              "      <td>2007</td>\n",
+              "    </tr>\n",
+              "  </tbody>\n",
+              "</table>\n",
+              "<p>333 rows × 8 columns</p>\n",
+              "</div>\n",
+              "    <div class=\"colab-df-buttons\">\n",
+              "\n",
+              "  <div class=\"colab-df-container\">\n",
+              "    <button class=\"colab-df-convert\" onclick=\"convertToInteractive('df-0f3e9059-10a1-4ae0-9f5c-041b7bce5ed1')\"\n",
+              "            title=\"Convert this dataframe to an interactive table.\"\n",
+              "            style=\"display:none;\">\n",
+              "\n",
+              "  <svg xmlns=\"http://www.w3.org/2000/svg\" height=\"24px\" viewBox=\"0 -960 960 960\">\n",
+              "    <path d=\"M120-120v-720h720v720H120Zm60-500h600v-160H180v160Zm220 220h160v-160H400v160Zm0 220h160v-160H400v160ZM180-400h160v-160H180v160Zm440 0h160v-160H620v160ZM180-180h160v-160H180v160Zm440 0h160v-160H620v160Z\"/>\n",
+              "  </svg>\n",
+              "    </button>\n",
+              "\n",
+              "  <style>\n",
+              "    .colab-df-container {\n",
+              "      display:flex;\n",
+              "      gap: 12px;\n",
+              "    }\n",
+              "\n",
+              "    .colab-df-convert {\n",
+              "      background-color: #E8F0FE;\n",
+              "      border: none;\n",
+              "      border-radius: 50%;\n",
+              "      cursor: pointer;\n",
+              "      display: none;\n",
+              "      fill: #1967D2;\n",
+              "      height: 32px;\n",
+              "      padding: 0 0 0 0;\n",
+              "      width: 32px;\n",
+              "    }\n",
+              "\n",
+              "    .colab-df-convert:hover {\n",
+              "      background-color: #E2EBFA;\n",
+              "      box-shadow: 0px 1px 2px rgba(60, 64, 67, 0.3), 0px 1px 3px 1px rgba(60, 64, 67, 0.15);\n",
+              "      fill: #174EA6;\n",
+              "    }\n",
+              "\n",
+              "    .colab-df-buttons div {\n",
+              "      margin-bottom: 4px;\n",
+              "    }\n",
+              "\n",
+              "    [theme=dark] .colab-df-convert {\n",
+              "      background-color: #3B4455;\n",
+              "      fill: #D2E3FC;\n",
+              "    }\n",
+              "\n",
+              "    [theme=dark] .colab-df-convert:hover {\n",
+              "      background-color: #434B5C;\n",
+              "      box-shadow: 0px 1px 3px 1px rgba(0, 0, 0, 0.15);\n",
+              "      filter: drop-shadow(0px 1px 2px rgba(0, 0, 0, 0.3));\n",
+              "      fill: #FFFFFF;\n",
+              "    }\n",
+              "  </style>\n",
+              "\n",
+              "    <script>\n",
+              "      const buttonEl =\n",
+              "        document.querySelector('#df-0f3e9059-10a1-4ae0-9f5c-041b7bce5ed1 button.colab-df-convert');\n",
+              "      buttonEl.style.display =\n",
+              "        google.colab.kernel.accessAllowed ? 'block' : 'none';\n",
+              "\n",
+              "      async function convertToInteractive(key) {\n",
+              "        const element = document.querySelector('#df-0f3e9059-10a1-4ae0-9f5c-041b7bce5ed1');\n",
+              "        const dataTable =\n",
+              "          await google.colab.kernel.invokeFunction('convertToInteractive',\n",
+              "                                                    [key], {});\n",
+              "        if (!dataTable) return;\n",
+              "\n",
+              "        const docLinkHtml = 'Like what you see? Visit the ' +\n",
+              "          '<a target=\"_blank\" href=https://colab.research.google.com/notebooks/data_table.ipynb>data table notebook</a>'\n",
+              "          + ' to learn more about interactive tables.';\n",
+              "        element.innerHTML = '';\n",
+              "        dataTable['output_type'] = 'display_data';\n",
+              "        await google.colab.output.renderOutput(dataTable, element);\n",
+              "        const docLink = document.createElement('div');\n",
+              "        docLink.innerHTML = docLinkHtml;\n",
+              "        element.appendChild(docLink);\n",
+              "      }\n",
+              "    </script>\n",
+              "  </div>\n",
+              "\n",
+              "\n",
+              "    </div>\n",
+              "  </div>\n"
+            ],
+            "application/vnd.google.colaboratory.intrinsic+json": {
+              "type": "dataframe",
+              "summary": "{\n  \"name\": \"percent_missing_by_row\",\n  \"rows\": 333,\n  \"fields\": [\n    {\n      \"column\": \"species\",\n      \"properties\": {\n        \"dtype\": \"category\",\n        \"num_unique_values\": 3,\n        \"samples\": [\n          \"Chinstrap\",\n          \"Adelie\",\n          \"Gentoo\"\n        ],\n        \"semantic_type\": \"\",\n        \"description\": \"\"\n      }\n    },\n    {\n      \"column\": \"island\",\n      \"properties\": {\n        \"dtype\": \"category\",\n        \"num_unique_values\": 3,\n        \"samples\": [\n          \"Dream\",\n          \"Biscoe\",\n          \"Torgersen\"\n        ],\n        \"semantic_type\": \"\",\n        \"description\": \"\"\n      }\n    },\n    {\n      \"column\": \"bill_length_mm\",\n      \"properties\": {\n        \"dtype\": \"number\",\n        \"std\": 5.468668342647558,\n        \"min\": 32.1,\n        \"max\": 59.6,\n        \"num_unique_values\": 163,\n        \"samples\": [\n          54.3,\n          40.3,\n          45.1\n        ],\n        \"semantic_type\": \"\",\n        \"description\": \"\"\n      }\n    },\n    {\n      \"column\": \"bill_depth_mm\",\n      \"properties\": {\n        \"dtype\": \"number\",\n        \"std\": 1.9692354633198998,\n        \"min\": 13.1,\n        \"max\": 21.5,\n        \"num_unique_values\": 79,\n        \"samples\": [\n          17.1,\n          18.7,\n          16.1\n        ],\n        \"semantic_type\": \"\",\n        \"description\": \"\"\n      }\n    },\n    {\n      \"column\": \"flipper_length_mm\",\n      \"properties\": {\n        \"dtype\": \"number\",\n        \"std\": 14.015765288287879,\n        \"min\": 172.0,\n        \"max\": 231.0,\n        \"num_unique_values\": 54,\n        \"samples\": [\n          176.0,\n          182.0,\n          231.0\n        ],\n        \"semantic_type\": \"\",\n        \"description\": \"\"\n      }\n    },\n    {\n      \"column\": \"body_mass_g\",\n      \"properties\": {\n        \"dtype\": \"number\",\n        \"std\": 805.2158019428967,\n        \"min\": 2700.0,\n        \"max\": 6300.0,\n        \"num_unique_values\": 93,\n        \"samples\": [\n          4850.0,\n          3150.0,\n          3475.0\n        ],\n        \"semantic_type\": \"\",\n        \"description\": \"\"\n      }\n    },\n    {\n      \"column\": \"sex\",\n      \"properties\": {\n        \"dtype\": \"category\",\n        \"num_unique_values\": 2,\n        \"samples\": [\n          \"male\",\n          \"female\"\n        ],\n        \"semantic_type\": \"\",\n        \"description\": \"\"\n      }\n    },\n    {\n      \"column\": \"year\",\n      \"properties\": {\n        \"dtype\": \"number\",\n        \"std\": 0,\n        \"min\": 2007,\n        \"max\": 2009,\n        \"num_unique_values\": 3,\n        \"samples\": [\n          2009,\n          2008\n        ],\n        \"semantic_type\": \"\",\n        \"description\": \"\"\n      }\n    }\n  ]\n}"
+            }
+          },
+          "metadata": {},
+          "execution_count": 27
+        }
+      ],
+      "source": [
+        "# Sort the `percent_missing_by_row` series in descending order\n",
+        "# How many of the rows are mostly empty\n",
+        "percent_missing_by_row.sort_values(by=\"year\",ascending=False)"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "id": "cbd841ce",
+      "metadata": {
+        "id": "cbd841ce",
+        "outputId": "aeee2d3e-4284-4194-d1d3-fd44721da173",
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        }
+      },
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "(344, 8)"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 13
+        }
+      ],
+      "source": [
+        "# Return shape before removing null values\n",
+        "df.shape"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# removing null values. Inplace=True makes this change permamnet\n",
+        "df.dropna(inplace = True)"
+      ],
+      "metadata": {
+        "id": "5M_1Zg5eyrGc"
+      },
+      "id": "5M_1Zg5eyrGc",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# Return shape after removing null values\n",
+        "df.shape\n"
+      ],
+      "metadata": {
+        "id": "5Otdz4LAyuZ1",
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "outputId": "0cad6648-8edd-4fce-a4e6-59f40c619226"
+      },
+      "id": "5Otdz4LAyuZ1",
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "(333, 8)"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 31
+        }
+      ]
+    }
+  ],
+  "metadata": {
+    "kernelspec": {
+      "display_name": "Python 3 (ipykernel)",
+      "language": "python",
+      "name": "python3"
+    },
+    "language_info": {
+      "codemirror_mode": {
+        "name": "ipython",
+        "version": 3
+      },
+      "file_extension": ".py",
+      "mimetype": "text/x-python",
+      "name": "python",
+      "nbconvert_exporter": "python",
+      "pygments_lexer": "ipython3",
+      "version": "3.9.7"
+    },
+    "colab": {
+      "provenance": [],
+      "include_colab_link": true
+    }
+  },
+  "nbformat": 4,
+  "nbformat_minor": 5
+}
